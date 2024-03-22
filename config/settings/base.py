@@ -234,8 +234,12 @@ CELERY_BROKER_CONNECTION_MAX_RETRIES = env.int(
 CELERY_BROKER_CHANNEL_ERROR_RETRY = env.bool(
     "CELERY_BROKER_CHANNEL_ERROR_RETRY", default=True
 )
-# http://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-result_backend
-CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND", default="redis://")
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#broker-connection-retry-on-startup
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = env.bool(
+    "CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP", default=True
+)
+# https://docs.celeryq.dev/en/latest/userguide/configuration.html#task-result-backend-settings
+CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND", default=None)
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-accept_content
 CELERY_ACCEPT_CONTENT = ["json"]
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#std:setting-task_serializer
@@ -438,7 +442,7 @@ ETH_INTERNAL_TXS_BLOCK_PROCESS_LIMIT = env.int(
     "ETH_INTERNAL_TXS_BLOCK_PROCESS_LIMIT", default=10_000
 )
 ETH_INTERNAL_TXS_BLOCKS_TO_REINDEX_AGAIN = env.int(
-    "ETH_INTERNAL_TXS_BLOCKS_TO_REINDEX_AGAIN", default=10
+    "ETH_INTERNAL_TXS_BLOCKS_TO_REINDEX_AGAIN", default=1
 )
 ETH_INTERNAL_TXS_NUMBER_TRACE_BLOCKS = env.int(
     "ETH_INTERNAL_TXS_NUMBER_TRACE_BLOCKS", default=10
@@ -465,7 +469,7 @@ ETH_EVENTS_BLOCK_PROCESS_LIMIT_MAX = env.int(
     "ETH_EVENTS_BLOCK_PROCESS_LIMIT_MAX", default=0
 )  # Maximum number of blocks to process together when searching for events. 0 == no limit.
 ETH_EVENTS_BLOCKS_TO_REINDEX_AGAIN = env.int(
-    "ETH_EVENTS_BLOCKS_TO_REINDEX_AGAIN", default=20
+    "ETH_EVENTS_BLOCKS_TO_REINDEX_AGAIN", default=2
 )  # Blocks to reindex again every indexer run when service is synced. Useful for RPCs not reliable
 ETH_EVENTS_GET_LOGS_CONCURRENCY = env.int(
     "ETH_EVENTS_GET_LOGS_CONCURRENCY", default=20
@@ -522,6 +526,9 @@ if NOTIFICATIONS_FIREBASE_CREDENTIALS_PATH:
 # ------------------------------------------------------------------------------
 EVENTS_QUEUE_URL = env("EVENTS_QUEUE_URL", default=None)
 EVENTS_QUEUE_EXCHANGE_NAME = env("EVENTS_QUEUE_EXCHANGE_NAME", default="amq.fanout")
+EVENTS_QUEUE_POOL_CONNECTIONS_LIMIT = env.int(
+    "EVENTS_QUEUE_POOL_CONNECTIONS_LIMIT", default=0
+)
 
 # Cache
 CACHE_ALL_TXS_VIEW = env.int(
@@ -551,3 +558,12 @@ SWAGGER_SETTINGS = {
         "api_key": {"type": "apiKey", "in": "header", "name": "Authorization"}
     },
 }
+
+# Shell Plus
+# ------------------------------------------------------------------------------
+SHELL_PLUS_PRINT_SQL_TRUNCATE = env.int("SHELL_PLUS_PRINT_SQL_TRUNCATE", default=10_000)
+
+# Endpoints
+TX_SERVICE_ALL_TXS_ENDPOINT_LIMIT_TRANSFERS = env.int(
+    "TX_SERVICE_ALL_TXS_ENDPOINT_LIMIT_TRANSFERS", default=1_000
+)  # Don't return more than 1_000 transfers
